@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Fuulea Helper</string>
+    <string name="title_home">主页</string>
+    <string name="title_tasks">任务</string>
+    <string name="title_settings">设置</string>
+    <string name="tasks_main">待完成</string>
+    <string name="tasks_finished">已完成</string>
+    <string name="tasks_favorite">收藏</string>
+    <string name="task_name">任务名称</string>
+    <string name="task_end_time">截止时间：</string>
+</resources>
