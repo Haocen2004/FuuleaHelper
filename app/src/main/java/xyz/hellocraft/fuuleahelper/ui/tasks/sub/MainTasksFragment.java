@@ -17,6 +17,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.scwang.smart.refresh.footer.BallPulseFooter;
+import com.scwang.smart.refresh.header.MaterialHeader;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
+import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +42,10 @@ public class MainTasksFragment extends Fragment {
     private TasksAdapter tasksAdapter;
     private FragmentMainTasksBinding binding;
     private SharedPreferences preferences;
+    private int curr_page = 1;
+    private ArrayList<TaskData> taskData = new ArrayList<>();
+    private RefreshLayout refLayout;
+    private int refAction = 0;
 
     public MainTasksFragment() {
     }
@@ -51,6 +61,21 @@ public class MainTasksFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        RefreshLayout refreshLayout = binding.refreshLayout;
+        refreshLayout.setRefreshHeader(new MaterialHeader(requireContext()));
+        refreshLayout.setRefreshFooter(new BallPulseFooter(requireContext()));
+        refreshLayout.setOnRefreshListener(refreshlayout -> {
+            curr_page = 1;
+            refLayout = refreshlayout;
+            refAction = 2;
+            taskData = new ArrayList<>();
+            new Thread(ref_page).start();
+        });
+        refreshLayout.setOnLoadMoreListener(refreshlayout -> {
+            refLayout = refreshlayout;
+            refAction = 1;
+            new Thread(ref_page).start();
+        });
         recyclerViewSp = binding.taskRecycleView;
         tasksAdapter = new TasksAdapter(getActivity());
         initAdapter(tasksAdapter);
@@ -60,31 +85,47 @@ public class MainTasksFragment extends Fragment {
 
     private void initAdapter(TasksAdapter adapter) {
 //        List<TaskData> sponsorDataOld = new ArrayList<>();
-        ArrayList<TaskData> taskData = new ArrayList<>();
 //        sponsorDataOld.add(new TaskData("Loading...", "", "a", "b", "c", "d"));
         adapter.setAllTasks(taskData);
-            new Thread(() -> {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("Cookie", "sessionid="+preferences.getString("sid",""));
-                map.put("Authorization", TOKEN);
-                String tasks_feedback = Network.sendGet("https://api.fuulea.com/api/task/?finished=false&page=1&favorite=false",map);
-                Logger.d("tasks",tasks_feedback);
-                try {
-                    JSONObject tasks_json = new JSONObject(tasks_feedback);
-                    JSONArray data_array = tasks_json.getJSONArray("data");
-                    for (int i = 0; i < data_array.length(); i++) {
-                        TaskData taskData1 = new TaskData();
-                        taskData1.parseJson(data_array.getJSONObject(i));
-                        taskData.add(taskData1);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                adapter.setAllTasks(taskData);
-                // 刷新操作
-                Looper.prepare();
-                new Handler(Looper.getMainLooper()).post(adapter::notifyDataSetChanged);
-                Looper.loop();
-            }).start();
+            new Thread(ref_page).start();
     }
+    Runnable ref_page = new Runnable() {
+        @Override
+        public void run() {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("Cookie", "sessionid="+preferences.getString("sid",""));
+            map.put("Authorization", TOKEN);
+            String tasks_feedback = Network.sendGet("https://api.fuulea.com/api/task/?finished=false&page="+curr_page+"&favorite=false",map);
+            Logger.d("tasks",tasks_feedback);
+            try {
+                JSONObject tasks_json = new JSONObject(tasks_feedback);
+                JSONArray data_array = tasks_json.getJSONArray("data");
+                for (int i = 0; i < data_array.length(); i++) {
+                    TaskData taskData1 = new TaskData();
+                    taskData1.parseJson(data_array.getJSONObject(i));
+                    taskData.add(taskData1);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tasksAdapter.setAllTasks(taskData);
+            curr_page++;
+            switch (refAction) {
+                case 0:
+                    break;
+                case 1:
+                    refLayout.finishLoadMore();
+                    refAction = 0;
+                    break;
+                case 2:
+                    refLayout.finishRefresh();
+                    refAction = 0;
+                    break;
+            }
+            // 刷新操作
+            Looper.prepare();
+            new Handler(Looper.getMainLooper()).post(tasksAdapter::notifyDataSetChanged);
+            Looper.loop();
+        }
+    };
 }

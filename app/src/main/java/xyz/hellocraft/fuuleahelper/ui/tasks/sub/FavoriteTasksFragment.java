@@ -1,66 +1,132 @@
 package xyz.hellocraft.fuuleahelper.ui.tasks.sub;
 
+import static xyz.hellocraft.fuuleahelper.utils.Constant.TOKEN;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import xyz.hellocraft.fuuleahelper.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FavoriteTasksFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.scwang.smart.refresh.footer.BallPulseFooter;
+import com.scwang.smart.refresh.header.MaterialHeader;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
+import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import xyz.hellocraft.fuuleahelper.adapter.TasksAdapter;
+import xyz.hellocraft.fuuleahelper.data.TaskData;
+import xyz.hellocraft.fuuleahelper.databinding.FragmentFavoriteTasksBinding;
+import xyz.hellocraft.fuuleahelper.databinding.FragmentMainTasksBinding;
+import xyz.hellocraft.fuuleahelper.utils.Logger;
+import xyz.hellocraft.fuuleahelper.utils.Network;
+
+
 public class FavoriteTasksFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private RecyclerView recyclerViewSp;
+    private TasksAdapter tasksAdapter;
+    private FragmentFavoriteTasksBinding binding;
+    private SharedPreferences preferences;
+    private int curr_page = 1;
+    private ArrayList<TaskData> taskData = new ArrayList<>();
+    private RefreshLayout refLayout;
+    private int refAction = 0;
 
     public FavoriteTasksFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FavoriteTasksFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FavoriteTasksFragment newInstance(String param1, String param2) {
-        FavoriteTasksFragment fragment = new FavoriteTasksFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorite_tasks, container, false);
+        binding = FragmentFavoriteTasksBinding.inflate(inflater, container, false);
+        preferences = getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
+        return binding.getRoot();
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        RefreshLayout refreshLayout = binding.refreshLayout;
+        refreshLayout.setRefreshHeader(new MaterialHeader(requireContext()));
+        refreshLayout.setRefreshFooter(new BallPulseFooter(requireContext()));
+        refreshLayout.setOnRefreshListener(refreshlayout -> {
+            curr_page = 1;
+            refLayout = refreshlayout;
+            refAction = 2;
+            taskData = new ArrayList<>();
+            new Thread(ref_page).start();
+        });
+        refreshLayout.setOnLoadMoreListener(refreshlayout -> {
+            refLayout = refreshlayout;
+            refAction = 1;
+            new Thread(ref_page).start();
+        });
+        recyclerViewSp = binding.taskRecycleView;
+        tasksAdapter = new TasksAdapter(getActivity());
+        initAdapter(tasksAdapter);
+        recyclerViewSp.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewSp.setAdapter(tasksAdapter);
+    }
+
+    private void initAdapter(TasksAdapter adapter) {
+//        List<TaskData> sponsorDataOld = new ArrayList<>();
+//        sponsorDataOld.add(new TaskData("Loading...", "", "a", "b", "c", "d"));
+        adapter.setAllTasks(taskData);
+        new Thread(ref_page).start();
+    }
+    Runnable ref_page = new Runnable() {
+        @Override
+        public void run() {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("Cookie", "sessionid="+preferences.getString("sid",""));
+            map.put("Authorization", TOKEN);
+            String tasks_feedback = Network.sendGet("https://api.fuulea.com/api/task/?finished=false&page="+curr_page+"&favorite=false",map);
+            Logger.d("tasks",tasks_feedback);
+            try {
+                JSONObject tasks_json = new JSONObject(tasks_feedback);
+                JSONArray data_array = tasks_json.getJSONArray("data");
+                for (int i = 0; i < data_array.length(); i++) {
+                    TaskData taskData1 = new TaskData();
+                    taskData1.parseJson(data_array.getJSONObject(i));
+                    taskData.add(taskData1);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tasksAdapter.setAllTasks(taskData);
+            curr_page++;
+            switch (refAction) {
+                case 0:
+                    break;
+                case 1:
+                    refLayout.finishLoadMore();
+                    refAction = 0;
+                    break;
+                case 2:
+                    refLayout.finishRefresh();
+                    refAction = 0;
+                    break;
+            }
+            // 刷新操作
+            Looper.prepare();
+            new Handler(Looper.getMainLooper()).post(tasksAdapter::notifyDataSetChanged);
+            Looper.loop();
+        }
+    };
 }
