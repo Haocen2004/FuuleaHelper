@@ -12,11 +12,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class Network {
 
@@ -289,11 +287,12 @@ public class Network {
         }
         return ret;
     }
-    public static String sendGet(String url, HashMap<String,String> map) {
-        return sendGet(url,map,true);
+
+    public static String sendGet(String url, Map<String, String> map) {
+        return sendGet(url, map, true);
     }
 
-    public static String sendGet(String s, HashMap<String, String> map, boolean autoRetry) {
+    public static String sendGet(String s, Map<String, String> map, boolean autoRetry) {
         String ret;
         while (true) {
             ret = realSendGet(s, map);

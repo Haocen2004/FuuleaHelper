@@ -1,14 +1,50 @@
 package xyz.hellocraft.fuuleahelper.data;
 
-import static java.lang.Integer.parseInt;
+import static xyz.hellocraft.fuuleahelper.utils.Constant.AUTH_MAP;
+
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class TaskData {
+import xyz.hellocraft.fuuleahelper.utils.Network;
+
+public class TaskData implements Serializable {
+    @Override
+    public String toString() {
+        return "TaskData{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", subject_id=" + subject_id +
+                ", finish_at='" + finish_at + '\'' +
+                ", description='" + description + '\'' +
+                ", subject_name='" + subject_name + '\'' +
+                ", published_at='" + published_at + '\'' +
+                ", end_at='" + end_at + '\'' +
+                ", show_answer_at='" + show_answer_at + '\'' +
+                ", allow_submit_if_delay=" + allow_submit_if_delay +
+                ", student_commit_pattern='" + student_commit_pattern + '\'' +
+                ", type=" + type +
+                ", mark_type=" + mark_type +
+                ", task_class_id=" + task_class_id +
+                ", is_favorite=" + is_favorite +
+                ", teacher_name='" + teacher_name + '\'' +
+                ", submit_at='" + submit_at + '\'' +
+                ", detail=" + detail +
+                ", force_submit=" + force_submit +
+                ", allow_collect_audio='" + allow_collect_audio + '\'' +
+                ", enable_judge_proper='" + enable_judge_proper + '\'' +
+                ", enable_correct='" + enable_correct + '\'' +
+                ", hash_id='" + hash_id + '\'' +
+                ", unfinished_students=" + unfinished_students +
+                ", has_detail=" + has_detail +
+                '}';
+    }
+
     private int id;
     private String title;
     private Integer subject_id;
@@ -26,7 +62,7 @@ public class TaskData {
     private boolean is_favorite;
     private String teacher_name;
     private String submit_at;
-    private ArrayList<TaskDetail> detail;
+    private ArrayList<TaskDetailData> detail;
     private Boolean force_submit;
     private String allow_collect_audio;
     private String enable_judge_proper;
@@ -35,12 +71,16 @@ public class TaskData {
     private ArrayList<String> unfinished_students;
 
     private boolean has_detail = false;
+    private static final String TAG = "TaskData";
 
     public void parseJson(JSONObject rawJson) {
         try {
             id = rawJson.getInt("id");
             title = rawJson.getString("title");
             description = rawJson.getString("description");
+            if (description.equals("null") || description.equals("")) {
+                description = "请认真完成";
+            }
             published_at = rawJson.getString("published_at");
             finish_at = rawJson.getString("finish_at");
             end_at = rawJson.getString("end_at");
@@ -59,23 +99,29 @@ public class TaskData {
         }
     }
 
-    public void getTaskDetail() {
+    public void setIs_favorite(boolean is_favorite) {
+        this.is_favorite = is_favorite;
+    }
+
+    public boolean getTaskDetail() {
         if (has_detail) {
-            return;
+            return true;
         }
+        String feedback = Network.sendGet("https://api.fuulea.com/api/task/" + id + "/", AUTH_MAP);
+        Log.d(TAG, feedback);
         try {
-        JSONObject rawJson = new JSONObject();
-        teacher_name = rawJson.getString("teacher_name");
-        submit_at = rawJson.getString("submit_at");
-        JSONArray details = rawJson.getJSONArray("detail");
-        ArrayList<TaskDetail> detailArrayList = new ArrayList<>();
+            JSONObject rawJson = new JSONObject(feedback);
+            teacher_name = rawJson.getString("first_name");
+            submit_at = rawJson.getString("submit_at");
+            JSONArray details = rawJson.getJSONArray("detail");
+            ArrayList<TaskDetailData> detailArrayList = new ArrayList<>();
             for (int i = 0; i < details.length(); i++) {
-                detailArrayList.add(new TaskDetail(details.getJSONObject(i)));
+                detailArrayList.add(new TaskDetailData(title, details.getJSONObject(i)));
             }
-        detail = detailArrayList;
-        force_submit = rawJson.getBoolean("force_submit");
-        allow_collect_audio = rawJson.getString("allow_collect_audio");
-        enable_judge_proper = rawJson.getString("enable_judge_proper");
+            detail = detailArrayList;
+            force_submit = rawJson.getBoolean("force_submit");
+            allow_collect_audio = rawJson.getString("allow_collect_audio");
+            enable_judge_proper = rawJson.getString("enable_judge_proper");
         enable_correct = rawJson.getString("enable_correct");
         hash_id = rawJson.getString("hash_id");
         JSONArray unfinished_stu = rawJson.getJSONArray("unfinished_students");
@@ -86,9 +132,11 @@ public class TaskData {
         unfinished_students = temp;
         } catch (JSONException e) {
             e.printStackTrace();
+            return false;
         }
 
         has_detail = true;
+        return true;
     }
 
     public boolean has_detail() {
@@ -117,7 +165,7 @@ public class TaskData {
         return submit_at;
     }
 
-    public ArrayList<TaskDetail> getDetail() {
+    public ArrayList<TaskDetailData> getDetail() {
         return detail;
     }
 
@@ -199,6 +247,15 @@ public class TaskData {
 
     public ArrayList<String> getUnfinished_students() {
         return unfinished_students;
+    }
+
+    public String getUnfinished_students_String() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String unfinished_student : unfinished_students) {
+            stringBuilder.append(unfinished_student);
+            stringBuilder.append("  ");
+        }
+        return stringBuilder.toString();
     }
 
 

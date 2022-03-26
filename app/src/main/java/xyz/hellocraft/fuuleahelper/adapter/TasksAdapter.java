@@ -1,8 +1,10 @@
 package xyz.hellocraft.fuuleahelper.adapter;
 
+import static xyz.hellocraft.fuuleahelper.utils.Constant.SUBJECT_MAP;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.net.Uri;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import xyz.hellocraft.fuuleahelper.R;
+import xyz.hellocraft.fuuleahelper.activity.TaskDetailActivity;
 import xyz.hellocraft.fuuleahelper.data.TaskData;
-
-import static xyz.hellocraft.fuuleahelper.utils.Constant.SUBJECT_MAP;
-
-import com.bumptech.glide.Glide;
 
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHolder> {
     private List<TaskData> allTasks;
@@ -47,13 +46,19 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
     public void onBindViewHolder(@NonNull final TaskViewHolder holder, final int position) {
         TaskData taskData = allTasks.get(position);
         holder.textViewName.setText(taskData.getTitle());
-        holder.textViewDesc.setText(activity.getString(R.string.task_end_time)+taskData.getEnd_at());
+        holder.textViewDesc.setText(activity.getString(R.string.task_end_time) + taskData.getEnd_at());
 //        String logo_url = SUBJECT_MAP.get(taskData.getSubject_id());
-        holder.imageViewAvatar.setImageResource(SUBJECT_MAP.get(taskData.getSubject_id()));
+        try {
+            holder.imageViewAvatar.setImageResource(SUBJECT_MAP.get(taskData.getSubject_id()));
+        } catch (Exception e) {
+            holder.imageViewAvatar.setImageResource(R.drawable.sub21);
+        }
 //        holder.imageViewAvatar.setImageURI(Uri.parse(logo_url));
 //        Glide.with(activity).load(logo_url).circleCrop().into(holder.imageViewAvatar);
         holder.itemView.setOnClickListener(v -> {
-            // TODO open task detail page
+            Intent intent = new Intent(activity, TaskDetailActivity.class);
+            intent.putExtra("data", taskData);
+            activity.startActivity(intent);
         });
     }
 
@@ -69,7 +74,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         TaskViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewName = itemView.findViewById(R.id.textViewName);
-            textViewDesc = itemView.findViewById(R.id.textViewDesc);
+            textViewDesc = itemView.findViewById(R.id.textViewType);
             imageViewAvatar = itemView.findViewById(R.id.imageViewAvatar);
 
         }

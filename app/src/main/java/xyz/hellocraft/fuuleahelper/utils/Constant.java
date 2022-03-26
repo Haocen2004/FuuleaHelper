@@ -26,5 +26,6 @@ public class Constant {
     }
     public static Boolean HAS_LOGIN = false;
     public static String TOKEN;
-    public static Map<Integer,Integer> SUBJECT_MAP;
+    public static Map<String, String> AUTH_MAP;
+    public static Map<Integer, Integer> SUBJECT_MAP;
 }

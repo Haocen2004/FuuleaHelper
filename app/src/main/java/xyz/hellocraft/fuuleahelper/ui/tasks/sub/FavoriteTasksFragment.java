@@ -1,6 +1,6 @@
 package xyz.hellocraft.fuuleahelper.ui.tasks.sub;
 
-import static xyz.hellocraft.fuuleahelper.utils.Constant.TOKEN;
+import static xyz.hellocraft.fuuleahelper.utils.Constant.AUTH_MAP;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,20 +20,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.scwang.smart.refresh.footer.BallPulseFooter;
 import com.scwang.smart.refresh.header.MaterialHeader;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
-import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
-import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import xyz.hellocraft.fuuleahelper.adapter.TasksAdapter;
 import xyz.hellocraft.fuuleahelper.data.TaskData;
 import xyz.hellocraft.fuuleahelper.databinding.FragmentFavoriteTasksBinding;
-import xyz.hellocraft.fuuleahelper.databinding.FragmentMainTasksBinding;
 import xyz.hellocraft.fuuleahelper.utils.Logger;
 import xyz.hellocraft.fuuleahelper.utils.Network;
 
@@ -93,10 +89,7 @@ public class FavoriteTasksFragment extends Fragment {
     Runnable ref_page = new Runnable() {
         @Override
         public void run() {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("Cookie", "sessionid="+preferences.getString("sid",""));
-            map.put("Authorization", TOKEN);
-            String tasks_feedback = Network.sendGet("https://api.fuulea.com/api/task/?finished=false&page="+curr_page+"&favorite=true",map);
+            String tasks_feedback = Network.sendGet("https://api.fuulea.com/api/task/?finished=false&page=" + curr_page + "&favorite=true", AUTH_MAP);
             Logger.d("tasks",tasks_feedback);
             try {
                 JSONObject tasks_json = new JSONObject(tasks_feedback);

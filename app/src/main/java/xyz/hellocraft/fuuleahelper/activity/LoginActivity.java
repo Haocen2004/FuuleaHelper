@@ -1,7 +1,6 @@
 package xyz.hellocraft.fuuleahelper.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import static xyz.hellocraft.fuuleahelper.utils.Constant.TOKEN;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,14 +12,15 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import xyz.hellocraft.fuuleahelper.databinding.ActivityLoginBinding;
 import xyz.hellocraft.fuuleahelper.utils.Logger;
 import xyz.hellocraft.fuuleahelper.utils.Network;
-
-import static xyz.hellocraft.fuuleahelper.utils.Constant.TOKEN;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
