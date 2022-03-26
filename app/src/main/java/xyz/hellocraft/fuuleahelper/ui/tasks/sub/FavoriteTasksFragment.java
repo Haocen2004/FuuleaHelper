@@ -96,7 +96,7 @@ public class FavoriteTasksFragment extends Fragment {
             HashMap<String, String> map = new HashMap<>();
             map.put("Cookie", "sessionid="+preferences.getString("sid",""));
             map.put("Authorization", TOKEN);
-            String tasks_feedback = Network.sendGet("https://api.fuulea.com/api/task/?finished=false&page="+curr_page+"&favorite=false",map);
+            String tasks_feedback = Network.sendGet("https://api.fuulea.com/api/task/?finished=false&page="+curr_page+"&favorite=true",map);
             Logger.d("tasks",tasks_feedback);
             try {
                 JSONObject tasks_json = new JSONObject(tasks_feedback);
