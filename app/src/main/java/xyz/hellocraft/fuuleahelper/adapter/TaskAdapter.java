@@ -14,12 +14,12 @@ import java.util.List;
 import xyz.hellocraft.fuuleahelper.R;
 import xyz.hellocraft.fuuleahelper.data.TaskDetailData;
 
-public class TaskDetailsAdapter extends RecyclerView.Adapter<TaskDetailsAdapter.TaskDetailViewHolder> {
+public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskDetailViewHolder> {
 
     private List<TaskDetailData> allDetails;
     private final Activity activity;
 
-    public TaskDetailsAdapter(Activity activity) {
+    public TaskAdapter(Activity activity) {
         this.activity = activity;
     }
 

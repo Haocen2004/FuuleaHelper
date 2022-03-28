@@ -17,15 +17,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import xyz.hellocraft.fuuleahelper.R;
-import xyz.hellocraft.fuuleahelper.activity.TaskDetailActivity;
+import xyz.hellocraft.fuuleahelper.activity.TaskActivity;
 import xyz.hellocraft.fuuleahelper.data.TaskData;
 
-public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHolder> {
+public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskViewHolder> {
     private List<TaskData> allTasks;
     private final Activity activity;
 
 
-    public TasksAdapter(Activity activity) {
+    public TaskListAdapter(Activity activity) {
         this.activity = activity;
     }
 
@@ -56,7 +56,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
 //        holder.imageViewAvatar.setImageURI(Uri.parse(logo_url));
 //        Glide.with(activity).load(logo_url).circleCrop().into(holder.imageViewAvatar);
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(activity, TaskDetailActivity.class);
+            Intent intent = new Intent(activity, TaskActivity.class);
             intent.putExtra("data", taskData);
             activity.startActivity(intent);
         });

@@ -17,21 +17,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import xyz.hellocraft.fuuleahelper.R;
-import xyz.hellocraft.fuuleahelper.adapter.TaskDetailsAdapter;
+import xyz.hellocraft.fuuleahelper.adapter.TaskAdapter;
 import xyz.hellocraft.fuuleahelper.data.TaskData;
 import xyz.hellocraft.fuuleahelper.data.TaskDetailData;
 import xyz.hellocraft.fuuleahelper.databinding.ActivityTaskDetailBinding;
 import xyz.hellocraft.fuuleahelper.utils.Logger;
 import xyz.hellocraft.fuuleahelper.utils.Network;
 
-public class TaskDetailActivity extends AppCompatActivity {
+public class TaskActivity extends AppCompatActivity {
 
     private Logger Log;
     private TaskData taskData;
     private ActivityTaskDetailBinding binding;
-    private static final String TAG = "TaskDetailActivity";
+    private static final String TAG = "TaskActivity";
     private RecyclerView recyclerViewSp;
-    private TaskDetailsAdapter taskDetailsAdapter;
+    private TaskAdapter taskAdapter;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -70,19 +70,19 @@ public class TaskDetailActivity extends AppCompatActivity {
             new Thread(() -> Network.sendPost("https://api.fuulea.com/api/task/" + taskData.getId() + "/favorite/", "", AUTH_MAP)).start();
         });
         recyclerViewSp = binding.recycleViewTasks;
-        taskDetailsAdapter = new TaskDetailsAdapter(this);
+        taskAdapter = new TaskAdapter(this);
         ArrayList<TaskDetailData> detailArrayList = new ArrayList<>();
-        taskDetailsAdapter.setAllDetails(detailArrayList);
+        taskAdapter.setAllDetails(detailArrayList);
         recyclerViewSp.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewSp.setAdapter(taskDetailsAdapter);
+        recyclerViewSp.setAdapter(taskAdapter);
         new Thread(load_data).start();
 
     }
 
     @SuppressLint("SetTextI18n")
     private void refView() {
-        taskDetailsAdapter.setAllDetails(taskData.getDetail());
-        taskDetailsAdapter.notifyItemRangeChanged(0, taskData.getDetail().size());
+        taskAdapter.setAllDetails(taskData.getDetail());
+        taskAdapter.notifyItemRangeChanged(0, taskData.getDetail().size());
         binding.textUnfinishedList.setText(taskData.getUnfinished_students_String());
         binding.textUnfinishedCount.setText(getText(R.string.task_unfinished_count).toString() + taskData.getUnfinished_students().size());
     }

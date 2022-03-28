@@ -27,7 +27,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import xyz.hellocraft.fuuleahelper.adapter.TasksAdapter;
+import xyz.hellocraft.fuuleahelper.adapter.TaskListAdapter;
 import xyz.hellocraft.fuuleahelper.data.TaskData;
 import xyz.hellocraft.fuuleahelper.databinding.FragmentFinishedTasksBinding;
 import xyz.hellocraft.fuuleahelper.utils.Logger;
@@ -36,7 +36,7 @@ import xyz.hellocraft.fuuleahelper.utils.Network;
 
 public class FinishedTasksFragment extends Fragment {
     private RecyclerView recyclerViewSp;
-    private TasksAdapter tasksAdapter;
+    private TaskListAdapter taskListAdapter;
     private FragmentFinishedTasksBinding binding;
     private SharedPreferences preferences;
     private int curr_page = 1;
@@ -74,13 +74,13 @@ public class FinishedTasksFragment extends Fragment {
             new Thread(ref_page).start();
         });
         recyclerViewSp = binding.taskRecycleView;
-        tasksAdapter = new TasksAdapter(getActivity());
-        initAdapter(tasksAdapter);
+        taskListAdapter = new TaskListAdapter(getActivity());
+        initAdapter(taskListAdapter);
         recyclerViewSp.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerViewSp.setAdapter(tasksAdapter);
+        recyclerViewSp.setAdapter(taskListAdapter);
     }
 
-    private void initAdapter(TasksAdapter adapter) {
+    private void initAdapter(TaskListAdapter adapter) {
 //        List<TaskData> sponsorDataOld = new ArrayList<>();
 //        sponsorDataOld.add(new TaskData("Loading...", "", "a", "b", "c", "d"));
         adapter.setAllTasks(taskData);
@@ -102,7 +102,7 @@ public class FinishedTasksFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            tasksAdapter.setAllTasks(taskData);
+            taskListAdapter.setAllTasks(taskData);
             curr_page++;
             switch (refAction) {
                 case 0:
@@ -118,7 +118,7 @@ public class FinishedTasksFragment extends Fragment {
             }
             // 刷新操作
             Looper.prepare();
-            new Handler(Looper.getMainLooper()).post(tasksAdapter::notifyDataSetChanged);
+            new Handler(Looper.getMainLooper()).post(taskListAdapter::notifyDataSetChanged);
             Looper.loop();
         }
     };
