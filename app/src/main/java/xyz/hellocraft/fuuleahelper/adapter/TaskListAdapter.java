@@ -73,7 +73,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
         TaskViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewName = itemView.findViewById(R.id.textViewName);
+            textViewName = itemView.findViewById(R.id.textViewHead);
             textViewDesc = itemView.findViewById(R.id.textViewType);
             imageViewAvatar = itemView.findViewById(R.id.imageViewAvatar);
 

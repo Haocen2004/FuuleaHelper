@@ -1,6 +1,8 @@
 package xyz.hellocraft.fuuleahelper.data;
 
-public class AttachmentData {
+import java.io.Serializable;
+
+public class AttachmentData implements Serializable {
     private String name;
     private String url;
 

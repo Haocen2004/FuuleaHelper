@@ -1,6 +1,7 @@
 package xyz.hellocraft.fuuleahelper.adapter;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import xyz.hellocraft.fuuleahelper.R;
+import xyz.hellocraft.fuuleahelper.activity.TaskDetailActivity;
 import xyz.hellocraft.fuuleahelper.data.TaskDetailData;
+import xyz.hellocraft.fuuleahelper.utils.Logger;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskDetailViewHolder> {
 
@@ -25,6 +28,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskDetailView
 
     public void setAllDetails(List<TaskDetailData> allDetails) {
         this.allDetails = allDetails;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        return super.getItemViewType(position);
     }
 
     @NonNull
@@ -51,7 +60,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskDetailView
         holder.textViewStatus.setText(taskStatus);
 //        String logo_url = SUBJECT_MAP.get(taskData.getSubject_id());
         holder.itemView.setOnClickListener(v -> {
-            // TODO open task detail page
+            if (taskDetailData.getPaper_id() != 0) {
+                Logger.d("TaskAdapter", "found paper_id: " + taskDetailData.getPaper_id());
+                Intent intent = new Intent(activity, TaskDetailActivity.class);
+                intent.putExtra("data", taskDetailData);
+                activity.startActivity(intent);
+            }
         });
     }
 
@@ -65,9 +79,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskDetailView
 
         TaskDetailViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewName = itemView.findViewById(R.id.textViewName);
+            textViewName = itemView.findViewById(R.id.textViewHead);
 //            textViewDesc = itemView.findViewById(R.id.textViewType);
-            textViewStatus = itemView.findViewById(R.id.textViewStatus);
+            textViewStatus = itemView.findViewById(R.id.textViewDetail);
 
         }
     }

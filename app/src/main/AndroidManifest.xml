@@ -13,11 +13,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FuuleaHelper">
         <activity
-            android:name=".activity.TaskActivity"
+            android:name=".activity.TaskDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.TaskActivity"
+            android:exported="false"
+            android:label="@string/title_task_detail" />
+        <activity
             android:name=".activity.LoginActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:label="@string/title_login" />
         <activity
             android:name=".activity.MainActivity"
             android:exported="true"

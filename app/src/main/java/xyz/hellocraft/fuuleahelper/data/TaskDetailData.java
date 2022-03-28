@@ -4,11 +4,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import xyz.hellocraft.fuuleahelper.utils.Logger;
 
-public class TaskDetailData {
+public class TaskDetailData implements Serializable {
     private int id;
     private int type;
     private boolean is_finished;
@@ -23,14 +24,12 @@ public class TaskDetailData {
     private int exercise_id;
     private boolean can_mark;
     private String correct_at;
-    private int paper_id;
+    private int paper_id = 0;
     private boolean enable_correct;
     //        type,is_finished,chapter_id,title,discuss,status,exercise_id,can_mark,correct_at,paper_id,attachments,enable_correct
-    private Logger Log;
 
     public TaskDetailData(String raw_title, JSONObject rawJson) {
         title = raw_title;
-        Log = Logger.getLogger(null);
         try {
             id = rawJson.getInt("id");
             type = rawJson.getInt("type");
@@ -48,7 +47,6 @@ public class TaskDetailData {
             status = rawJson.getString("status");
             audio = rawJson.get("id").toString();
         } catch (JSONException e) {
-            e.printStackTrace();
             Logger.d("Parse Detail", "Normal Parse Failed. Try Second parse.");
             try {
                 type = rawJson.getInt("type");
@@ -67,7 +65,6 @@ public class TaskDetailData {
                 paper_id = rawJson.getInt("paper_id");
                 enable_correct = rawJson.getBoolean("enable_correct");
             } catch (JSONException e1) {
-                e1.printStackTrace();
                 Logger.d("Parse Detail", "Second Parse Failed. Try Special parse.");
                 try {
                     type = rawJson.getInt("type");
@@ -89,8 +86,10 @@ public class TaskDetailData {
                     }
                     attachments = temp;
                 } catch (JSONException ex) {
+                    e.printStackTrace();
+                    e1.printStackTrace();
                     ex.printStackTrace();
-                    Log.makeToast("detail 解析错误!");
+                    Logger.getLogger(null).makeToast("detail 解析错误!");
                 }
             }
 
@@ -132,10 +131,6 @@ public class TaskDetailData {
 
     public boolean isEnable_correct() {
         return enable_correct;
-    }
-
-    public Logger getLog() {
-        return Log;
     }
 
     public int getType() {

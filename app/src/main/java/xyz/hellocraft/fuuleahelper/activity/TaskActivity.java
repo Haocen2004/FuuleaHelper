@@ -20,7 +20,7 @@ import xyz.hellocraft.fuuleahelper.R;
 import xyz.hellocraft.fuuleahelper.adapter.TaskAdapter;
 import xyz.hellocraft.fuuleahelper.data.TaskData;
 import xyz.hellocraft.fuuleahelper.data.TaskDetailData;
-import xyz.hellocraft.fuuleahelper.databinding.ActivityTaskDetailBinding;
+import xyz.hellocraft.fuuleahelper.databinding.ActivityTaskBinding;
 import xyz.hellocraft.fuuleahelper.utils.Logger;
 import xyz.hellocraft.fuuleahelper.utils.Network;
 
@@ -28,7 +28,7 @@ public class TaskActivity extends AppCompatActivity {
 
     private Logger Log;
     private TaskData taskData;
-    private ActivityTaskDetailBinding binding;
+    private ActivityTaskBinding binding;
     private static final String TAG = "TaskActivity";
     private RecyclerView recyclerViewSp;
     private TaskAdapter taskAdapter;
@@ -37,7 +37,7 @@ public class TaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityTaskDetailBinding.inflate(getLayoutInflater());
+        binding = ActivityTaskBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         Log = Logger.getLogger(this);
         Intent intent = getIntent();

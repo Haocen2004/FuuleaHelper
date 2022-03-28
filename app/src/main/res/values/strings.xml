@@ -13,4 +13,8 @@
     <string name="login_btn">Login</string>
     <string name="task_unfinished_list">Unfinished List</string>
     <string name="task_unfinished_count">"Total: "</string>
+    <string name="task_upload_photo">Upload Photo</string>
+    <string name="title_task_detail">Task Detail</string>
+    <string name="title_login">Login Account</string>
+    <string name="task_submit">Submit</string>
 </resources>

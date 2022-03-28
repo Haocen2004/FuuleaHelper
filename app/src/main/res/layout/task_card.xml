@@ -50,7 +50,7 @@
                 app:srcCompat="@drawable/ic_launcher_foreground" />
 
             <TextView
-                android:id="@+id/textViewName"
+                android:id="@+id/textViewHead"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -75,8 +75,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/guideline5"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/textViewName"
-                app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+                app:layout_constraintStart_toStartOf="@+id/textViewHead"
+                app:layout_constraintTop_toBottomOf="@+id/textViewHead" />
 
 
             <ImageView
